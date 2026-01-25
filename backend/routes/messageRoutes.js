@@ -46,4 +46,56 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/last-messages', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId || req.user.id;
+
+    const lastMessages = await Message.aggregate([
+      {
+        $match: {
+          $or: [
+            { senderId: new mongoose.Types.ObjectId(userId) },
+            { receiverId: new mongoose.Types.ObjectId(userId) }
+          ]
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $group: {
+          _id: { $ifNull: ["$chatId", "$receiverId"] },
+          lastMessage: { $first: "$$ROOT" }
+        }
+      }
+    ]);
+
+    const result = lastMessages.map(item => {
+      const msg = item.lastMessage;
+      let preview = '';
+      if (msg.type === 'text') {
+        preview = msg.text;
+      } else if (msg.type === 'image') {
+        preview = 'Photo';
+      } else if (msg.type === 'video') {
+        preview = 'Video';
+      } else if (msg.type === 'audio') {
+        preview = 'Audio';
+      } else if (msg.type === 'file') {
+        preview = 'File';
+      }
+      return {
+        chatId: item._id,
+        lastMessage: preview,
+        lastMessageAt: msg.createdAt
+      };
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error('Error fetching last messages:', err);
+    res.status(500).json({ message: 'Failed to fetch last messages' });
+  }
+});
+
 module.exports = router;
