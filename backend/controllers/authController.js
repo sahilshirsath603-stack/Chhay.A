@@ -68,7 +68,7 @@ const login = async (req, res) => {
 // GET USERS
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}, '_id email lastSeen');
+    const users = await User.find({}, '_id email name about avatar lastSeen');
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch users' });
@@ -78,7 +78,7 @@ const getUsers = async (req, res) => {
 // GET USERS STATUS
 const getUsersStatus = async (req, res) => {
   try {
-    const users = await User.find({}, '_id email lastSeen');
+    const users = await User.find({}, '_id email name about avatar lastSeen');
     // Online status determined ONLY from active Socket.IO connections
     res.json(users);
   } catch (err) {
@@ -109,10 +109,49 @@ const getPresence = async (req, res) => {
   }
 };
 
+// GET ME
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('name email about avatar lastSeen');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('Get me error:', err);
+    res.status(500).json({ message: 'Failed to fetch user data' });
+  }
+};
+
+// UPDATE PROFILE
+const updateProfile = async (req, res) => {
+  try {
+    const { name, about, avatar } = req.body;
+    const userId = req.user._id;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (about !== undefined) updateData.about = about;
+    if (avatar !== undefined) updateData.avatar = avatar;
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(updatedUser);
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+};
+
 module.exports = {
   signup,
   login,
   getUsers,
   getUsersStatus,
-  getPresence
+  getPresence,
+  getMe,
+  updateProfile
 };
