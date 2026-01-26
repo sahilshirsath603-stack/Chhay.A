@@ -1,14 +1,15 @@
-# TODO: Implement WhatsApp-style Avatar Upload and Global Propagation
+# WhatsApp Avatar Viewer Implementation
 
-## Backend Changes
-- [x] Add `uploadAvatar` function in `authController.js`: Handle multipart/form-data upload, save file to uploads/, update user.avatar with URL, return updated user.
-- [x] Add route `POST /api/users/avatar` in `authRoutes.js` with authMiddleware and multer.
+## Completed Tasks
+- [x] Create AvatarViewerModal.js - Fullscreen modal with dark backdrop, centered avatar (image or initials), close button (✕), ESC/backdrop close. For self: "Change photo" button reusing existing crop flow. For others: view-only.
+- [x] Modify UserProfile.js - Update avatar click to open AvatarViewerModal instead of file input.
+- [x] Modify Chat.js - Add click handlers to sidebar and chat header avatars to open AvatarViewerModal.
+- [x] Add AvatarViewerModal import and state management in Chat.js
+- [x] Add AvatarViewerModal JSX in Chat.js
 
-## Frontend Changes
-- [x] Update `UserProfile.js`: Make avatar clickable for self-profile, open file picker on click, upload via POST /api/users/avatar, update local state and call onProfileUpdate on success.
-- [x] Update `Chat.js`: After profile update, refresh currentUser and users list. Replace initials with avatar images where avatar exists, else show initials. Ensure read-only for others.
-
-## Testing
-- [ ] Test avatar upload and propagation.
-- [ ] Ensure persistence after refresh.
-- [ ] Verify no breaking changes to existing uploads.
+## Next Steps
+- [ ] Test modal from UserProfile, sidebar, and chat header.
+- [ ] Verify close methods (✕, ESC, backdrop).
+- [ ] Confirm "Change photo" only for self-profile.
+- [ ] Run application and test functionality
+- [ ] Commit changes with: git add . && git commit -m "feat(ui): fullscreen avatar viewer with self-only change photo"
