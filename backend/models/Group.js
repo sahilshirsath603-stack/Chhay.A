@@ -6,6 +6,10 @@ const groupSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  avatar: {
+    type: String,
+    default: null
+  },
   members: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

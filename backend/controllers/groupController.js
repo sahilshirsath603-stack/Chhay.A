@@ -257,6 +257,54 @@ const renameGroup = async (req, res) => {
   }
 };
 
+const updateGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { name } = req.body;
+    const userId = req.user._id;
+
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+
+    // Check if user is admin
+    if (!Group.isAdmin(userId, group)) {
+      return res.status(403).json({ message: 'Only admins can update the group' });
+    }
+
+    // Update fields if provided
+    if (name !== undefined) {
+      if (!name || !name.trim()) {
+        return res.status(400).json({ message: 'Group name cannot be empty' });
+      }
+      group.name = name.trim();
+    }
+
+    // Handle avatar upload
+    if (req.file) {
+      group.avatar = `http://localhost:5000/uploads/${req.file.filename}`;
+    }
+
+    await group.save();
+
+    await group.populate('members', 'email');
+    await group.populate('admins', 'email');
+    await group.populate('createdBy', 'email');
+
+    // Emit real-time update to all clients globally
+    global.io.emit('group-updated', {
+      groupId,
+      group
+    });
+
+    res.json(group);
+  } catch (error) {
+    console.error('Error updating group:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   createGroup,
   getGroups,
@@ -264,5 +312,6 @@ module.exports = {
   getGroupMedia,
   addMember,
   removeMember,
+  updateGroup,
   renameGroup
 };

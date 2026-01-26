@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
+const { upload } = require('../controllers/uploadController');
 
-const { createGroup, getGroups, getGroupById, addMember, removeMember, getGroupMedia, renameGroup } = require('../controllers/groupController');
+const { createGroup, getGroups, getGroupById, addMember, removeMember, getGroupMedia, updateGroup, renameGroup } = require('../controllers/groupController');
 
 // Get all groups for logged-in user
 router.get('/', authMiddleware, getGroups);
@@ -27,5 +28,8 @@ router.get('/:groupId/media', authMiddleware, getGroupMedia);
 
 // Rename group (admin only)
 router.put('/:groupId/rename', authMiddleware, renameGroup);
+
+// Update group (admin only)
+router.put('/:groupId/update', authMiddleware, upload.single('avatar'), updateGroup);
 
 module.exports = router;
