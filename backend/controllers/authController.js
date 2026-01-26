@@ -146,6 +146,27 @@ const updateProfile = async (req, res) => {
   }
 };
 
+// UPLOAD AVATAR
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const avatarUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, { avatar: avatarUrl }, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(updatedUser);
+  } catch (err) {
+    console.error('Upload avatar error:', err);
+    res.status(500).json({ message: 'Failed to upload avatar' });
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -153,5 +174,6 @@ module.exports = {
   getUsersStatus,
   getPresence,
   getMe,
-  updateProfile
+  updateProfile,
+  uploadAvatar
 };
