@@ -1,0 +1,75 @@
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1a1a1a;
+    /* Dark body background like reference image */
+    color: #fff;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #e9ecef;
+    /* Light gray header */
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    /* Dark logo text */
+}
+
+.nav-actions {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-actions span {
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    color: #666;
+}
+
+.nav-actions span:hover,
+.nav-actions span.active {
+    color: #000;
+}
+
+/* Specific styling for the Search bar in the header */
+.header-search {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fff;
+    width: 200px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.header-search::placeholder {
+    color: #999;
+}
+
+main {
+    flex-grow: 1;
+    overflow-y: auto;
+    position: relative;
+}

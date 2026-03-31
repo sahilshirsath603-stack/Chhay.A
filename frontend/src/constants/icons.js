@@ -1,0 +1,23 @@
+export const APP_ICONS = {
+    chats: "MessageCircle",
+    groups: "Users",
+    media: "Image",
+    profile: "User",
+    reply: "Reply",
+    forward: "Forward",
+    copy: "Copy",
+    delete: "Trash2",
+    send: "Send",
+    attach: "Plus",
+    mic: "Mic",
+    settings: "Settings",
+    back: "ArrowLeft",
+    smile: "Smile",
+    edit: "Edit2",
+    docs: "FileText",
+    download: "Download",
+    link: "Link",
+    rooms: "Flame",
+    mapPin: "MapPin",
+    file: "File"
+};

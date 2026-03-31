@@ -1,0 +1,220 @@
+/* Media View Styles */
+.media-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    background: var(--color-bg-app);
+    overflow-y: auto;
+}
+
+.media-header {
+    display: flex;
+    margin-bottom: var(--spacing-lg);
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Pill-style Tabs */
+.media-tab {
+    padding: 8px 16px;
+    background: var(--color-bg-surface-hover);
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+}
+
+.media-tab:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+
+.media-tab.active {
+    background-color: var(--color-brand-primary);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.media-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.no-media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    text-align: center;
+    margin-top: 40px;
+    opacity: 0.6;
+}
+
+.media-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+/* Simple Spinner */
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--color-bg-surface-hover);
+    border-top: 3px solid var(--color-brand-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.date-group {
+    margin-bottom: var(--spacing-xl);
+}
+
+.media-date-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-sm);
+}
+
+/* Responsive Grid Layout */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Media Cards */
+.media-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
+    aspect-ratio: 1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 140px;
+    /* Fixed height for stability */
+}
+
+.media-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.media-image,
+.media-video {
+    width: 100%;
+    height: 140px;
+    /* Force fixed height */
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+    /* Remove inline-block spacing */
+}
+
+.media-timestamp {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    color: white;
+    padding: 24px 8px 8px;
+    font-size: 11px;
+    text-align: right;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+/* Documents List - Card Style */
+.documents-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.document-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.document-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-hover);
+}
+
+.document-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-right: 12px;
+    overflow: hidden;
+}
+
+.document-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.document-size {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.download-link {
+    padding: 8px 16px;
+    background: var(--color-bg-active);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.download-link:hover {
+    background-color: var(--color-brand-primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.document-timestamp {
+    display: none;
+}

@@ -1,0 +1,100 @@
+.bottom-command-dock {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(30, 30, 30, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 12px;
+    z-index: 1000;
+    border-radius: 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dock-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: transparent;
+}
+
+/* Base Item Styles */
+.dock-item {
+    position: relative;
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    cursor: pointer;
+    color: var(--dock-muted);
+    transition: all var(--transition-fast);
+    border-radius: 50%;
+}
+
+.dock-item:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-hover);
+}
+
+.dock-item.active {
+    color: var(--dock-active);
+}
+
+/* Active Dot Indicator */
+.dock-item.active::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--dock-active);
+    position: absolute;
+    bottom: 4px;
+}
+
+.dock-icon {
+    font-size: 20px;
+    margin-bottom: 2px;
+    transition: transform var(--transition-fast);
+}
+
+.dock-item.active .dock-icon {
+    transform: translateY(-2px);
+}
+
+.dock-label {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+}
+
+.dock-item.active .dock-label {
+    opacity: 1;
+    font-weight: 600;
+}
+
+/* Primary Action Button (Create) styles removed */
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .dock-label {
+        display: none;
+    }
+}
+
+/* Notification Badge */
+.dock-badge {
+    position: absolute;
+    top: 4px;
+    right: 25%;
+    width: 8px;
+    height: 8px;
+    background-color: #FF4D6D;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--color-bg-surface);
+}

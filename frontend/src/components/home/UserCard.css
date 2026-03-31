@@ -1,0 +1,265 @@
+.user-card {
+    background: #111a2f;
+    border-radius: 18px;
+    padding: 32px 24px 24px 24px;
+    text-align: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    /* Removed overflow:hidden to let auras breathe naturally */
+}
+
+.clickable-card {
+    cursor: pointer;
+}
+
+.clickable-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 255, 255, 0.05);
+    z-index: 10;
+}
+
+.clickable-card:active {
+    transform: scale(0.98);
+}
+
+.clickable-card:hover .mood-aura-container {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
+
+/* Room Badge */
+.room-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.8);
+    color: #c4b5fd;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+/* Presence Dot */
+.presence-dot {
+    position: absolute;
+    bottom: 0px;
+    right: 15px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #111a2f;
+    /* match card bg */
+    z-index: 3;
+}
+
+.presence-dot.online {
+    background: #2ecc71;
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+}
+
+.presence-dot.offline {
+    background: #555;
+    border-color: #111a2f;
+}
+
+/* Mood Aura Restyling & Animations */
+.mood-aura-container {
+    position: relative;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    padding: 4px;
+    /* Space for the aura glow */
+    transition: all 0.3s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Base Pulse Fallback */
+@keyframes auraPulse {
+    0% {
+        box-shadow: 0 0 10px var(--aura-color);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--aura-color);
+    }
+
+    100% {
+        box-shadow: 0 0 10px var(--aura-color);
+    }
+}
+
+.mood-aura-container[style*="--aura-color"] {
+    animation: auraPulse 3s infinite ease-in-out;
+}
+
+.mood-aura-container[style*="transparent"] {
+    animation: none;
+}
+
+/* Specific Aura Animations */
+.aura-animated.aura-happy {
+    animation: auraPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes breatheGlow {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 5px var(--aura-color);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px var(--aura-color);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px var(--aura-color);
+    }
+}
+
+.aura-animated.aura-chill {
+    animation: breatheGlow 4s infinite ease-in-out;
+}
+
+@keyframes flickerGlow {
+    0% {
+        box-shadow: 0 0 15px var(--aura-color);
+        opacity: 1;
+    }
+
+    25% {
+        box-shadow: 0 0 25px var(--aura-color), inset 0 0 5px var(--aura-color);
+        opacity: 0.9;
+    }
+
+    50% {
+        box-shadow: 0 0 8px var(--aura-color);
+        opacity: 1;
+    }
+
+    75% {
+        box-shadow: 0 0 30px var(--aura-color);
+        opacity: 0.8;
+    }
+
+    100% {
+        box-shadow: 0 0 15px var(--aura-color);
+        opacity: 1;
+    }
+}
+
+.aura-animated.aura-active {
+    animation: flickerGlow 1.5s infinite alternate;
+}
+
+@keyframes steadyGlow {
+    0% {
+        box-shadow: 0 0 0px 4px rgba(59, 130, 246, 0.3), 0 0 15px var(--aura-color);
+    }
+
+    100% {
+        box-shadow: 0 0 0px 6px rgba(59, 130, 246, 0.4), 0 0 20px var(--aura-color);
+    }
+}
+
+.aura-animated.aura-deepwork {
+    animation: steadyGlow 2s infinite alternate ease-in-out;
+}
+
+/* Mood Icon Placement */
+.mood-icon {
+    position: absolute;
+    bottom: -5px;
+    left: -5px;
+    /* Moved to left so presence dot is right */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border: 2px solid #111a2f;
+    z-index: 3;
+}
+
+/* Text */
+.user-name-text {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.user-bio-text {
+    margin: 0 0 10px 0;
+    color: #aaa;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: clip;
+    min-height: 2.8em;
+    /* Reserve 2 lines */
+}
+
+/* Inline Vibe */
+.inline-vibe {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* Actions */
+.card-actions-fixed {
+    margin-top: auto;
+    /* pushes buttons to the bottom */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    width: 100%;
+    display: block;
+}
+
+.action-btn.connect-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.action-btn.message-btn {
+    background: transparent;
+    border: 1px solid rgba(139, 92, 246, 0.6);
+    color: #c4b5fd;
+    cursor: pointer;
+}
+
+.action-btn.message-btn:hover {
+    background: rgba(139, 92, 246, 0.15);
+}

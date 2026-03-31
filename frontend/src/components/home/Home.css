@@ -1,0 +1,23 @@
+/* ANTIGRAVITY V2 — PREMIUM CENTERED GRID */
+
+.home-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #0b1220 0%, #0e1628 100%);
+    display: flex;
+    justify-content: center;
+}
+
+.home-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* GRID */
+
+.discover-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 32px;
+}
