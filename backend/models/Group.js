@@ -18,7 +18,7 @@ const groupSchema = new mongoose.Schema({
   admins: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    default: function() { return [this.createdBy]; }
+    default: function () { return [this.createdBy]; }
   }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,7 +32,7 @@ const groupSchema = new mongoose.Schema({
 });
 
 // Helper method to check if a user is an admin of the group
-groupSchema.statics.isAdmin = function(userId, group) {
+groupSchema.statics.isAdmin = function (userId, group) {
   // Check if user is in admins array
   if (group.admins && group.admins.length > 0) {
     return group.admins.some(admin => admin.toString() === userId.toString());
@@ -41,4 +41,4 @@ groupSchema.statics.isAdmin = function(userId, group) {
   return group.createdBy.toString() === userId.toString();
 };
 
-module.exports = mongoose.model('Group', groupSchema);
+module.exports = mongoose.models.Group || mongoose.model('Group', groupSchema);

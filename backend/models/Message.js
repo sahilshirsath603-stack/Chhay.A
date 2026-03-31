@@ -20,6 +20,16 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    roomId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MicroRoom',
+      default: null
+    },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+      default: null
+    },
     text: {
       type: String,
       default: ''
@@ -53,9 +63,20 @@ const messageSchema = new mongoose.Schema(
     read: {
       type: Boolean,
       default: false
-    }
+    },
+    reactions: [{
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      },
+      emoji: {
+        type: String,
+        required: true
+      }
+    }]
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Message', messageSchema);
+module.exports = mongoose.models.Message || mongoose.model('Message', messageSchema);

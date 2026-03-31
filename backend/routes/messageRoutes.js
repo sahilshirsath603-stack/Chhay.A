@@ -32,7 +32,9 @@ router.get('/', authMiddleware, async (req, res) => {
       };
     }
 
-    const messages = await Message.find(query).sort({ createdAt: 1 });
+    const messages = await Message.find(query)
+      .populate('replyTo', 'text type senderId')
+      .sort({ createdAt: 1 });
 
     return res.json(messages);
   } catch (err) {

@@ -11,11 +11,7 @@ router.get('/', authMiddleware, getGroups);
 // Get group by ID
 router.get('/:groupId', authMiddleware, getGroupById);
 
-// Create new group
-router.post('/', authMiddleware, (req, res, next) => {
-  console.log("GROUP ROUTE HIT", req.body, req.user?.id);
-  next();
-}, createGroup);
+router.post('/', authMiddleware, createGroup);
 
 // Add member to group
 router.post('/:groupId/members', authMiddleware, addMember);

@@ -1,8 +1,4 @@
-console.log('server.js file is executing');
-console.log('Attempting MongoDB connection...');
-
 require('dotenv').config({ path: '.env.local' });
-
 
 const express = require('express');
 const http = require('http');
@@ -15,13 +11,17 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
+const userRoutes = require('./routes/userRoutes');
+const connectionRoutes = require('./routes/connectionRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 const { initializeSocket } = require('./sockets/socket');
 
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
@@ -34,22 +34,87 @@ app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/media', authMiddleware, mediaRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/users', authMiddleware, userRoutes);
+app.use('/api/connections', authMiddleware, connectionRoutes);
+app.use('/api/notifications', authMiddleware, notificationRoutes);
+app.use('/api/settings', authMiddleware, settingsRoutes);
+app.use('/api', userRoutes);
 
 const server = http.createServer(app);
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
+const User = require('./models/User');
+const MicroRoom = require('./models/MicroRoom');
+const Message = require('./models/Message');
+
+const RoomArchive = require('./models/RoomArchive');
+
+// Expiration Cron Jobs
+setInterval(async () => {
+  try {
+    const now = new Date();
+    // 1) Clear expired Auras
+    const auraResult = await User.updateMany(
+      { 'aura.expiresAt': { $lt: now }, 'aura.type': { $ne: null } },
+      { $set: { aura: { type: null, color: null, icon: null, expiresAt: null } } }
+    );
+    if (auraResult.modifiedCount > 0) {
+      global.io.emit('auras-expired');
+    }
+
+    // 2) Clear expired MicroRooms and their messages
+    const expiredRooms = await MicroRoom.find({ expiresAt: { $lt: now } });
+    if (expiredRooms.length > 0) {
+      const roomIds = expiredRooms.map(r => r._id);
+
+      // Archive rooms before deletion
+      const archives = expiredRooms.map(room => {
+        const durationHours = room.createdAt ? (room.expiresAt - room.createdAt) / 3600000 : 1;
+        return {
+          parentChatId: room.parentChatId,
+          title: room.title,
+          durationHours: Math.round(durationHours),
+          totalMessages: room.stats?.messageCount || 0,
+          peakParticipants: room.stats?.peakParticipants || room.participants?.length || 0,
+          createdBy: room.createdBy
+        };
+      });
+      if (archives.length > 0) {
+        await RoomArchive.insertMany(archives);
+      }
+
+      await Message.deleteMany({ roomId: { $in: roomIds } });
+      await MicroRoom.deleteMany({ _id: { $in: roomIds } });
+
+      roomIds.forEach(id => {
+        global.io.emit('micro-room-expired', id);
+      });
+    }
+  } catch (err) {
+    console.error('Error in expiration cron:', err);
+  }
+}, 60 * 1000); // Check every minute
+
+
 global.io = io;
 
 initializeSocket(io);
 
+// Centralized error handler
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err)
+  }
+  res.status(500).json({ message: 'Internal Server Error' });
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });

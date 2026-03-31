@@ -9,7 +9,6 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const userId = req.userId || req.user.id;
     const { groupId } = req.query;
-    console.log("AUTH USER:", userId);
 
     let query = {
       type: { $ne: 'text' }

@@ -21,7 +21,7 @@ router.post(
   upload.single('file'),
   (req, res) => {
     res.json({
-      url: `http://localhost:5000/uploads/${req.file.filename}`,
+      url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/${req.file.filename}`,
       type: req.file.mimetype
     });
   }
