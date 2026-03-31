@@ -17,7 +17,10 @@ export default function PresenceStrip({ users, loading }) {
                 >
                     <div style={{
                         width: '56px', height: '56px', borderRadius: '50%',
-                        background: user.avatar ? `url(${user.avatar}) center/cover` : '#444',
+                        backgroundImage: user.avatar ? `url("${user.avatar}")` : 'none',
+                        backgroundColor: user.avatar ? 'transparent' : '#444',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                         border: '2px solid var(--accent-color, #25d366)', // simulate active ring
                         padding: '2px', // gap inside ring
                         backgroundClip: 'content-box'

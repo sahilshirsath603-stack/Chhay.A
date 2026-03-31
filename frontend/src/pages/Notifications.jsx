@@ -158,7 +158,10 @@ export default function Notifications({ token }) {
             <div key={req._id} className={`notification-row request-row ${req.status === 'pending' ? 'unread' : ''}`}>
                 <div className="row-content" onClick={() => navigate(`/profile/${user._id}`)}>
                     <div className="row-avatar" style={{
-                        background: user.avatar ? `url(${user.avatar}) center/cover` : "var(--color-bg-active, #333)"
+                        backgroundImage: user.avatar ? `url("${user.avatar}")` : 'none',
+                        backgroundColor: user.avatar ? 'transparent' : 'var(--color-bg-active, #333)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
                     }}>
                         {!user.avatar && initial}
                     </div>
@@ -208,7 +211,10 @@ export default function Notifications({ token }) {
             <div key={notif._id} className={`notification-row ${typeClass} ${!notif.read ? 'unread' : ''}`}>
                 <div className="row-content" onClick={() => user && navigate(`/profile/${user._id}`)}>
                     <div className="row-avatar" style={{
-                        background: (user && user.avatar) ? `url(${user.avatar}) center/cover` : "var(--color-bg-active, #333)"
+                        backgroundImage: (user && user.avatar) ? `url("${user.avatar}")` : 'none',
+                        backgroundColor: (user && user.avatar) ? 'transparent' : 'var(--color-bg-active, #333)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
                     }}>
                         {!(user && user.avatar) && initial}
                     </div>

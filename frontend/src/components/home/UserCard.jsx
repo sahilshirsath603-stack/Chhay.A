@@ -107,7 +107,10 @@ export default function UserCard({ user, currentUser, sentRequests, isOnline, is
             >
                 <div className="avatar-placeholder" style={{
                     width: '80px', height: '80px', borderRadius: '50%',
-                    background: user.avatar ? `url(${user.avatar}) center/cover` : '#ccc',
+                    backgroundImage: user.avatar ? `url("${user.avatar}")` : 'none',
+                    backgroundColor: user.avatar ? 'transparent' : '#ccc',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                     border: hasAura ? `3px solid ${auraColor}` : '3px solid #fff',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}></div>
