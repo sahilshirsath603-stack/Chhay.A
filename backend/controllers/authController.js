@@ -58,7 +58,7 @@ const signup = async (req, res) => {
 
     let avatarUrl = null;
     if (req.file) {
-      avatarUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/${req.file.filename}`;
+      avatarUrl = req.file.path;
     }
 
     const newUser = await User.create({
@@ -287,7 +287,7 @@ const uploadAvatar = async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const avatarUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/${req.file.filename}`;
+    const avatarUrl = req.file.path;
     const updatedUser = await User.findByIdAndUpdate(req.user._id, { avatar: avatarUrl }, { new: true });
 
     if (!updatedUser) {

@@ -283,7 +283,7 @@ const updateGroup = async (req, res) => {
 
     // Handle avatar upload
     if (req.file) {
-      group.avatar = `${process.env.BACKEND_URL || 'http://localhost:5000'}/uploads/${req.file.filename}`;
+      group.avatar = req.file.path;
     }
 
     await group.save();

@@ -1,24 +1,9 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
 const router = express.Router();
 
+const { upload } = require('../config/cloudinaryConfig');
 const controllers = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
-
-const storage = multer.diskStorage({
-  destination: 'uploads/',
-  filename: (req, file, cb) => {
-    let ext = path.extname(file.originalname);
-    if (!ext || ext === '.') {
-      ext = `.${file.mimetype.split('/')[1]}`;
-      if (ext === '.jpeg') ext = '.jpg';
-    }
-    cb(null, Date.now() + ext);
-  }
-});
-
-const upload = multer({ storage });
 
 // ⛔ STOP HERE IF ANY ARE UNDEFINED
 router.post('/signup', upload.single('profileImage'), controllers.signup);
