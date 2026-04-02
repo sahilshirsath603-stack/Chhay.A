@@ -26,7 +26,12 @@ function UserProfile({ user, onClose, userStatuses = {}, mediaMessages = [], sho
   const [showCropModal, setShowCropModal] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [showAvatarViewer, setShowAvatarViewer] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [user?._id, user?.avatar]);
 
   const status = userStatuses[user?._id]?.online
     ? 'Online'
@@ -254,8 +259,13 @@ function UserProfile({ user, onClose, userStatuses = {}, mediaMessages = [], sho
               }}
               onClick={handleAvatarClick}
             >
-              {user.avatar ? (
-                <img src={user.avatar} alt="Avatar" className="modern-avatar-img" />
+              {user.avatar && !imgError ? (
+                <img 
+                  src={user.avatar} 
+                  alt="Avatar" 
+                  className="modern-avatar-img" 
+                  onError={() => setImgError(true)} 
+                />
               ) : (
                 <span className="modern-avatar-initial">{(user.name || user.email || '?').charAt(0).toUpperCase()}</span>
               )}

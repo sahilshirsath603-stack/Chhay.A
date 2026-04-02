@@ -5,7 +5,12 @@ import { uploadAvatar } from '../services/api';
 const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate }) => {
   const [showCropModal, setShowCropModal] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
+  const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [displayEntity?.avatar]);
 
   const isSelf = currentUser && user && currentUser._id === user._id;
   const isGroupAdmin = group && currentUser && group.admins && group.admins.some(admin => admin._id?.toString() === currentUser._id);
@@ -91,11 +96,12 @@ const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate 
         <div style={styles.modal}>
           <button onClick={onClose} style={styles.closeBtn}>✕</button>
           <div style={styles.avatarContainer}>
-            {displayEntity.avatar ? (
+            {displayEntity.avatar && !imgError ? (
               <img
                 src={displayEntity.avatar}
                 alt="Avatar"
                 style={styles.avatarImage}
+                onError={() => setImgError(true)}
               />
             ) : (
               <div style={styles.avatarFallback}>
