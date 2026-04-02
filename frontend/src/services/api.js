@@ -34,7 +34,7 @@ export const getUsers = async () => {
 
 export const uploadAvatar = async (avatarFile) => {
   const formData = new FormData();
-  formData.append('avatar', avatarFile);
+  formData.append('avatar', avatarFile, 'avatar.jpg');
   const response = await api.post('/auth/users/avatar', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

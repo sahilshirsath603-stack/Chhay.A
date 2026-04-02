@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
+const mongoose = require('mongoose');
 
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -58,6 +59,10 @@ const RoomArchive = require('./models/RoomArchive');
 
 // Expiration Cron Jobs
 setInterval(async () => {
+  if (mongoose.connection.readyState !== 1) {
+    return; // Skip execution if DB is not fully connected (e.g., during connection drops, sleep)
+  }
+
   try {
     const now = new Date();
     // 1) Clear expired Auras

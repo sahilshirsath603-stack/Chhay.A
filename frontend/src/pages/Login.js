@@ -81,9 +81,9 @@ function Login({ onLogin }) {
         <div className="login-header">
           <div className="login-logo">
             <Icon name={APP_ICONS.activity} size={32} color="#7C5CFF" />
-            <span className="login-logo-text">ChhayA</span>
+            <span className="login-logo-text">Swarix</span>
           </div>
-          <div className="login-tagline">Connect through moods</div>
+          <div className="login-tagline">Connect with people who match your vibe.</div>
         </div>
 
         {error && (

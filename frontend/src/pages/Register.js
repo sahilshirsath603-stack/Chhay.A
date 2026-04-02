@@ -186,9 +186,9 @@ function Register({ onLogin }) {
         <div className="register-header">
           <div className="register-logo">
             <Icon name={APP_ICONS.activity} size={32} color="#7C5CFF" />
-            <span className="register-logo-text">ChhayA</span>
+            <span className="register-logo-text">Swarix</span>
           </div>
-          <div className="register-subtitle">Create your account</div>
+          <div className="register-subtitle">Connect with people who match your vibe.</div>
         </div>
 
         {error && (

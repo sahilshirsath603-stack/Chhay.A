@@ -1,4 +1,4 @@
-Chhay.A
+# Swarix
 
 A modern real-time social discovery and messaging platform where users connect, chat, and express themselves through mood-based profiles and interactive features.
 
