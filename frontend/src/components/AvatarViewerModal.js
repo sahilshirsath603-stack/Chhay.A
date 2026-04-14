@@ -41,10 +41,10 @@ const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate 
         const image = await Camera.getPhoto({
           quality: 90,
           allowEditing: false,
-          resultType: CameraResultType.DataUrl,
+          resultType: CameraResultType.Uri,
           source: CameraSource.Prompt,
         });
-        setImageSrc(image.dataUrl);
+        setImageSrc(image.webPath);
         setShowCropModal(true);
       } else {
         fileInputRef.current.click();
