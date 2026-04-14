@@ -73,3 +73,30 @@ main {
     overflow-y: auto;
     position: relative;
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 12px 15px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-actions {
+        width: 100%;
+        gap: 12px;
+        justify-content: space-between;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+    
+    .nav-actions span {
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* Hide scrollbar for cleaner look */
+    .nav-actions::-webkit-scrollbar {
+        display: none;
+    }
+}

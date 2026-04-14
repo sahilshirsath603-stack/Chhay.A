@@ -277,8 +277,8 @@ export default function Settings({ theme, toggleTheme }) {
 
                 <div className="settings-section" style={{ marginTop: '2rem' }}>
                     <h3>About</h3>
-                    <p style={{ color: '#888' }}>Swarix App Layout Version</p>
-                    <p style={{ color: '#888' }}>Swarix v1.0.0 framework</p>
+                    <p style={{ color: '#888' }}>Connectify App Layout Version</p>
+                    <p style={{ color: '#888' }}>Connectify v1.0.0 framework</p>
                 </div>
 
                 <div className="settings-section" style={{ marginTop: '3rem', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.1))', paddingTop: '2rem' }}>

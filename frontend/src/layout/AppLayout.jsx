@@ -11,16 +11,16 @@ export default function AppLayout({ onLogout }) {
         <div className="app-layout">
             <header className="app-header">
                 <div className="header-left">
-                    {/* Swarix placeholder logo icon */}
+                    {/* Connectify placeholder logo icon */}
                     <img 
                         src="/logo.jpg" 
-                        alt="Swarix Logo" 
+                        alt="Connectify Logo" 
                         className="layout-logo-img"
                         onClick={() => navigate("/home")} 
                         style={{ width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', objectFit: 'cover' }}
                     />
                     <div className="logo" onClick={() => navigate("/home")}>
-                        Swarix
+                        Connectify
                     </div>
                 </div>
 
