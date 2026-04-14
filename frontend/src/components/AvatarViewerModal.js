@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AvatarCropModal from './AvatarCropModal';
 import { uploadAvatar } from '../services/api';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate }) => {
   const [showCropModal, setShowCropModal] = useState(false);
@@ -33,8 +34,24 @@ const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate 
     }
   };
 
-  const handleChangePhoto = () => {
-    fileInputRef.current.click();
+  const handleChangePhoto = async () => {
+    try {
+      if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        // Automatically requests OS permissions and safely opens OS file picker intent
+        const image = await Camera.getPhoto({
+          quality: 90,
+          allowEditing: false,
+          resultType: CameraResultType.DataUrl,
+          source: CameraSource.Prompt,
+        });
+        setImageSrc(image.dataUrl);
+        setShowCropModal(true);
+      } else {
+        fileInputRef.current.click();
+      }
+    } catch (error) {
+      console.error("Permission denied or user cancelled:", error);
+    }
   };
 
   const handleAvatarChange = (event) => {
