@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Chaaya</string>
-    <string name="title_activity_main">Chaaya</string>
+    <string name="app_name">Connectify</string>
+    <string name="title_activity_main">Connectify</string>
     <string name="package_name">com.antigravity.chaaya</string>
     <string name="custom_url_scheme">com.antigravity.chaaya</string>
 </resources>
