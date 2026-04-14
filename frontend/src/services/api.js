@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// Prioritize the Render live URL, then local dev URLs
+const LIVE_URL = 'https://chhay-achaaya-backend.onrender.com/api';
+const LOCAL_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api';
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}`,
+  baseURL: process.env.REACT_APP_API_URL || LIVE_URL || LOCAL_URL,
 });
 
 api.interceptors.request.use((config) => {

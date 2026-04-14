@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'whatsapp_clone', // Folder in cloudinary
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'avi', 'mov', 'wmv', 'pdf', 'zip', 'mp3', 'wav', 'mpeg', 'webm'],
+    allowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'avi', 'mov', 'wmv', 'pdf', 'zip', 'mp3', 'wav', 'mpeg', 'webm'],
     // We can allow resource_type 'auto' to support images, videos, and raw files
     resource_type: 'auto'
   }

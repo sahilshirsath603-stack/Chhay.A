@@ -1,4 +1,5 @@
 require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 
 const express = require('express');
 const http = require('http');
@@ -22,7 +23,7 @@ const { initializeSocket } = require('./sockets/socket');
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -45,7 +46,7 @@ const server = http.createServer(app);
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -114,6 +115,7 @@ initializeSocket(io);
 
 // Centralized error handler
 app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR HANDLER CAUGHT:", err);
   if (res.headersSent) {
     return next(err)
   }

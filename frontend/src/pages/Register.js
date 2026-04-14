@@ -34,6 +34,10 @@ function Register({ onLogin }) {
   const [passwordStrength, setPasswordStrength] = useState(null); // 'weak', 'medium', 'strong', null
   const [passwordsMatch, setPasswordsMatch] = useState(true);
 
+  const getApiUrl = () => {
+    return process.env.REACT_APP_API_URL || 'https://chhay-achaaya-backend.onrender.com/api';
+  };
+
   // Auto-focus first input
   useEffect(() => {
     if (nameInputRef.current) {
@@ -57,7 +61,7 @@ function Register({ onLogin }) {
 
       setUsernameStatus('checking');
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/check-username?username=${username}`);
+        const res = await axios.get(`${getApiUrl()}/auth/check-username?username=${username}`);
         setUsernameStatus(res.data.available ? 'available' : 'taken');
       } catch (err) {
         setUsernameStatus('error');
@@ -147,7 +151,7 @@ function Register({ onLogin }) {
       }
 
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/signup`,
+        `${getApiUrl()}/auth/signup`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -163,7 +167,11 @@ function Register({ onLogin }) {
       }
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please select a different email or username.');
+      if (!err.response) {
+        setError('Network error. Check if backend is running.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please select a different email or username.');
+      }
     } finally {
       setIsLoading(false);
     }

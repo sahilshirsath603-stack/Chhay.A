@@ -13,7 +13,7 @@ export const SocketProvider = ({ children, token }) => {
   useEffect(() => {
     if (!token) return;
 
-    const s = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000', {
+    const s = io(process.env.REACT_APP_SOCKET_URL || 'https://chhay-achaaya-backend.onrender.com', {
       auth: { token }
     });
 

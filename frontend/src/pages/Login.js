@@ -33,8 +33,9 @@ function Login({ onLogin }) {
     setIsLoading(true);
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'https://chhay-achaaya-backend.onrender.com/api';
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/login`,
+        `${apiUrl}/auth/login`,
         { email, password }
       );
 
@@ -51,10 +52,12 @@ function Login({ onLogin }) {
       if (onLogin) onLogin(token);
       navigate('/home');
     } catch (err) {
-      if (err.response?.status === 401) {
+      if (err.response?.status === 401 || err.response?.status === 400) {
         setError('Invalid email or password');
       } else if (err.response?.status === 500) {
         setError('Server error. Please try again later.');
+      } else if (!err.response) {
+        setError('Network error. Check if backend is running.');
       } else {
         setError(err.response?.data?.message || 'Login failed');
       }

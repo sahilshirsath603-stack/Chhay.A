@@ -64,6 +64,46 @@ router.get('/seed-global', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// TEMPORARY MEDIA CLEANUP ROUTE
+router.get('/clean-legacy-media', async (req, res) => {
+  const User = require('../models/User');
+  const Message = require('../models/Message');
+
+  try {
+    // 1. Reset broken user avatars
+    const userResult = await User.updateMany(
+      { avatar: { $regex: /uploads\//i } },
+      { $set: { avatar: null } }
+    );
+
+    // 2. Convert broken media messages to text
+    const messageResult = await Message.updateMany(
+      { 
+        type: { $in: ['image', 'video', 'file', 'audio'] }, 
+        fileUrl: { $regex: /uploads\//i } 
+      },
+      { 
+        $set: { 
+          type: 'text', 
+          text: '📸 Media expired (legacy upload)', 
+          fileUrl: null 
+        } 
+      }
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Legacy media cleaned successfully', 
+      avatarsReset: userResult.modifiedCount,
+      messagesFixed: messageResult.modifiedCount 
+    });
+  } catch(e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.get('/users/room-archives', authMiddleware, controllers.getRoomArchives);
 router.put('/users/profile', authMiddleware, controllers.updateProfile);
 router.post('/users/avatar', authMiddleware, upload.single('avatar'), controllers.uploadAvatar);
