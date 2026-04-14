@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
 import axios from 'axios';
 import Home from './components/home/Home';
 import Chat from './pages/Chat';
@@ -65,6 +66,25 @@ function App() {
 
     return () => {
       axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
+  // Native Android hardware Back Button handling
+  useEffect(() => {
+    const handleBackButton = async () => {
+      CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (!canGoBack) {
+          CapacitorApp.exitApp();
+        } else {
+          window.history.back();
+        }
+      });
+    };
+    
+    handleBackButton();
+
+    return () => {
+      CapacitorApp.removeAllListeners();
     };
   }, []);
 

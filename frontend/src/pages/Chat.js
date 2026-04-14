@@ -1386,12 +1386,7 @@ function Chat({ token, onLogout, theme, toggleTheme }) {
                     setSelectedProfileUser(selectedUser);
                   }}
                 >
-                  <button className="back-icon-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/messages');
-                  }}>
-                    <Icon name={APP_ICONS.back} size={24} />
-                  </button>
+
                   <div
                     className={`header-avatar ${selectedUser.aura ? 'aura-active' : ''}`}
                     style={selectedUser.aura ? { "--aura-color": selectedUser.aura.color } : {}}
@@ -1657,12 +1652,7 @@ function Chat({ token, onLogout, theme, toggleTheme }) {
                   className="chat-header-left"
                   onClick={() => openGroupProfile(selectedGroup._id)}
                 >
-                  <button className="back-icon-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/messages');
-                  }}>
-                    <Icon name={APP_ICONS.back} size={24} />
-                  </button>
+
                   <div className="header-avatar">
                     {selectedGroup.avatar ? (
                       <img
@@ -1894,12 +1884,7 @@ function Chat({ token, onLogout, theme, toggleTheme }) {
             <div className="chat-header">
               {currentMicroRoom ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}>
-                  <button className="back-icon-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate('/rooms');
-                  }}>
-                    <Icon name={APP_ICONS.back} size={24} />
-                  </button>
+
                   <div style={{ background: '#FF4D6D22', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name={APP_ICONS.activity} size={20} color="#FF4D6D" />
                   </div>
