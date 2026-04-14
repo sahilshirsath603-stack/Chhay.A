@@ -9,13 +9,13 @@ const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate 
   const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    setImgError(false);
-  }, [displayEntity?.avatar]);
-
   const isSelf = currentUser && user && currentUser._id === user._id;
   const isGroupAdmin = group && currentUser && group.admins && group.admins.some(admin => admin._id?.toString() === currentUser._id);
   const displayEntity = user || group;
+
+  useEffect(() => {
+    setImgError(false);
+  }, [displayEntity?.avatar]);
 
   // Handle ESC key
   useEffect(() => {
@@ -122,7 +122,7 @@ const AvatarViewerModal = ({ user, group, currentUser, onClose, onProfileUpdate 
               />
             ) : (
               <div style={styles.avatarFallback}>
-                {group ? group.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                {group ? (group?.name || '?').charAt(0).toUpperCase() : (user?.name || user?.email || '?').charAt(0).toUpperCase()}
               </div>
             )}
           </div>
