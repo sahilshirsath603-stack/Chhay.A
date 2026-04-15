@@ -30,4 +30,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes
+userSchema.index({ 'aura.expiresAt': 1 }); // Optimize cron job
+
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);

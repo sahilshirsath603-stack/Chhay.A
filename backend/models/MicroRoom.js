@@ -37,4 +37,7 @@ const microRoomSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Indexes
+microRoomSchema.index({ expiresAt: 1 }); // Optimize cron job
+
 module.exports = mongoose.models.MicroRoom || mongoose.model('MicroRoom', microRoomSchema);

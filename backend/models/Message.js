@@ -79,4 +79,10 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes for performance
+messageSchema.index({ senderId: 1, receiverId: 1 });
+messageSchema.index({ chatId: 1 });
+messageSchema.index({ roomId: 1 });
+messageSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.models.Message || mongoose.model('Message', messageSchema);
