@@ -1,7 +1,13 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const ConnectionRequest = require('../models/ConnectionRequest');
+const { sendVerificationOTP, sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
+const otpService = require('../services/otpService');
+
+// ─── Helper: Sign JWT ────────────────────────────────────────────────────────
+const signToken = (userId) => jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
 // CHECK USERNAME
 const checkUsername = async (req, res) => {
@@ -46,7 +52,7 @@ const signup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Parse interests, if it comes as a JSON string from FormData
+    // Parse interests
     let parsedInterests = [];
     if (interests) {
       try {
@@ -61,6 +67,10 @@ const signup = async (req, res) => {
       avatarUrl = req.file.path;
     }
 
+    // Generate & store OTP securely
+    const otp = otpService.generateOTP();
+    const hashedOtp = await otpService.hashOTP(otp);
+
     const newUser = await User.create({
       name,
       username,
@@ -69,25 +79,31 @@ const signup = async (req, res) => {
       about: bio || '',
       defaultMood: defaultMood || null,
       interests: parsedInterests,
-      avatar: avatarUrl
+      avatar: avatarUrl,
+      isVerified: false, // must verify via OTP
     });
 
-    const token = jwt.sign(
-      { userId: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Store hashed OTP in Redis (5 min TTL)
+    const redisStored = await otpService.storeOTP(newUser._id.toString(), hashedOtp);
+
+    // Fallback: if Redis unavailable, store in Mongo temporarily
+    if (!redisStored) {
+      newUser.emailVerifyOTP = hashedOtp;
+      newUser.emailVerifyOTPExpiry = new Date(Date.now() + 5 * 60 * 1000);
+      await newUser.save();
+    }
+
+    // Send OTP email (non-blocking — don't fail signup if email fails)
+    try {
+      await sendVerificationOTP(email, name, otp);
+    } catch (emailErr) {
+      console.error('Failed to send OTP email:', emailErr.message);
+    }
 
     res.status(201).json({
-      message: 'User created successfully',
-      token,
-      user: {
-        _id: newUser._id,
-        name: newUser.name,
-        username: newUser.username,
-        email: newUser.email,
-        avatar: newUser.avatar
-      }
+      message: 'Account created. Please verify your email with the OTP sent to ' + email,
+      requiresVerification: true,
+      email,
     });
   } catch (err) {
     console.error('Signup error:', err);
@@ -95,16 +111,23 @@ const signup = async (req, res) => {
   }
 };
 
-// LOGIN
+// LOGIN (accepts email OR username)
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email: identifier, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password required' });
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Email/username and password required' });
     }
 
-    const user = await User.findOne({ email });
+    // Find by email OR username (case-insensitive)
+    const isEmail = identifier.includes('@');
+    const user = await User.findOne(
+      isEmail
+        ? { email: identifier.toLowerCase().trim() }
+        : { username: { $regex: new RegExp(`^${identifier.trim()}$`, 'i') } }
+    );
+
     if (!user || !user.passwordHash) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -114,16 +137,203 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Check email verification
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: 'Please verify your email before logging in.',
+        requiresVerification: true,
+        email: user.email,
+      });
+    }
 
+    const token = signToken(user._id);
     res.json({ token });
   } catch (err) {
     console.error(err);
+
     res.status(500).json({ message: 'Login failed' });
+  }
+};
+
+// VERIFY OTP
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'Email is already verified' });
+    }
+
+    // ── Redis-backed verification (with bcrypt compare + attempt limiting) ──
+    const result = await otpService.verifyOTP(user._id.toString(), otp.toString());
+
+    if (!result.success) {
+      // Fallback: if Redis unavailable, check Mongo stored hash
+      if (result.error.includes('expired or does not exist') && user.emailVerifyOTP) {
+        const mongoMatch = await bcrypt.compare(otp.toString(), user.emailVerifyOTP);
+        if (!mongoMatch) {
+          return res.status(400).json({ message: 'Invalid OTP.' });
+        }
+        if (user.emailVerifyOTPExpiry && new Date() > user.emailVerifyOTPExpiry) {
+          return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+        }
+        // Mongo fallback matched — continue below
+      } else {
+        return res.status(400).json({
+          message: result.error,
+          attemptsLeft: result.attemptsLeft,
+        });
+      }
+    }
+
+    // Mark verified & clear OTP fields
+    user.isVerified = true;
+    user.emailVerifyOTP = null;
+    user.emailVerifyOTPExpiry = null;
+    await user.save();
+
+    // Send welcome email (non-blocking)
+    try { await sendWelcomeEmail(email, user.name); } catch (_) {}
+
+    const token = signToken(user._id);
+
+    res.json({
+      message: 'Email verified successfully!',
+      token,
+      user: { _id: user._id, name: user.name, username: user.username, email: user.email, avatar: user.avatar },
+    });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    res.status(500).json({ message: 'Verification failed' });
+  }
+};
+
+// RESEND OTP
+const resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.isVerified) return res.status(400).json({ message: 'Email is already verified' });
+
+    // Check per-user rate limit (max 3 requests per 5 min)
+    const rateCheck = await otpService.checkOTPRequestRate(user._id.toString());
+    if (!rateCheck.allowed) {
+      return res.status(429).json({
+        message: `Too many OTP requests. Please wait ${Math.ceil(rateCheck.resetInSeconds / 60)} minute(s) before requesting again.`,
+        resetInSeconds: rateCheck.resetInSeconds,
+      });
+    }
+
+    const otp = otpService.generateOTP();
+    const hashedOtp = await otpService.hashOTP(otp);
+
+    // Store in Redis
+    const redisStored = await otpService.storeOTP(user._id.toString(), hashedOtp);
+
+    // Fallback: store in Mongo if Redis unavailable
+    if (!redisStored) {
+      user.emailVerifyOTP = hashedOtp;
+      user.emailVerifyOTPExpiry = new Date(Date.now() + 5 * 60 * 1000);
+      await user.save();
+    }
+
+    try {
+      await sendVerificationOTP(email, user.name, otp);
+    } catch (emailErr) {
+      console.error('Failed to resend OTP:', emailErr.message);
+      return res.status(500).json({ message: 'Failed to send OTP email. Check server email config.' });
+    }
+
+    res.json({
+      message: 'OTP resent successfully',
+      remainingRequests: rateCheck.remaining,
+    });
+  } catch (err) {
+    console.error('Resend OTP error:', err);
+    res.status(500).json({ message: 'Failed to resend OTP' });
+  }
+};
+
+// FORGOT PASSWORD
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const user = await User.findOne({ email });
+    // Always return success even if email doesn't exist (security best practice)
+    if (!user) {
+      return res.json({ message: 'If that email exists, a reset link has been sent.' });
+    }
+
+    // Check per-user rate limit
+    const rateCheck = await otpService.checkOTPRequestRate(`reset_${user._id.toString()}`);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({
+        message: `Too many reset requests. Please wait ${Math.ceil(rateCheck.resetInSeconds / 60)} minute(s).`,
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = token;
+    user.passwordResetExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+    await user.save();
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+    try {
+      await sendPasswordResetEmail(email, user.name, resetLink);
+    } catch (emailErr) {
+      console.error('Failed to send reset email:', emailErr.message);
+      return res.status(500).json({ message: 'Failed to send reset email. Check server email config.' });
+    }
+
+    res.json({ message: 'If that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ message: 'Failed to process request' });
+  }
+};
+
+// RESET PASSWORD
+const resetPassword = async (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+    if (!email || !token || !newPassword) {
+      return res.status(400).json({ message: 'Email, token, and new password are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !user.passwordResetToken || user.passwordResetToken !== token) {
+      return res.status(400).json({ message: 'Invalid or expired reset link' });
+    }
+    if (new Date() > user.passwordResetExpiry) {
+      return res.status(400).json({ message: 'Reset link has expired. Please request a new one.' });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    user.passwordResetToken = null;
+    user.passwordResetExpiry = null;
+    await user.save();
+
+    res.json({ message: 'Password reset successfully. You can now log in.' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ message: 'Failed to reset password' });
   }
 };
 
@@ -393,6 +603,10 @@ module.exports = {
   checkUsername,
   signup,
   login,
+  verifyOTP,
+  resendOTP,
+  forgotPassword,
+  resetPassword,
   getUsers,
   getUsersStatus,
   getPresence,

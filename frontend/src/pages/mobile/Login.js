@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Icon from '../components/ui/Icon';
-import { APP_ICONS } from '../constants/icons';
+import Icon from '../../components/ui/Icon';
+import { APP_ICONS } from '../../constants/icons';
 import './Login.css'; // New CSS file
 
 function Login({ onLogin }) {

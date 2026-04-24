@@ -4,10 +4,16 @@ const router = express.Router();
 const { upload } = require('../config/cloudinaryConfig');
 const controllers = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
+const { otpRequestLimiter, otpVerifyLimiter, authLimiter } = require('../middleware/rateLimitMiddleware');
+const { validateEmail, validateOTP, validateNewPassword } = require('../middleware/validateMiddleware');
 
-// ⛔ STOP HERE IF ANY ARE UNDEFINED
-router.post('/signup', upload.single('profileImage'), controllers.signup);
-router.post('/login', controllers.login);
+// Auth routes — with rate limiting and input validation
+router.post('/signup', authLimiter, upload.single('profileImage'), controllers.signup);
+router.post('/login', authLimiter, controllers.login);
+router.post('/verify-otp', otpVerifyLimiter, validateEmail, validateOTP, controllers.verifyOTP);
+router.post('/resend-otp', otpRequestLimiter, validateEmail, controllers.resendOTP);
+router.post('/forgot-password', otpRequestLimiter, validateEmail, controllers.forgotPassword);
+router.post('/reset-password', validateEmail, validateNewPassword, controllers.resetPassword);
 router.get('/check-username', controllers.checkUsername);
 router.get('/users', authMiddleware, controllers.getUsers);
 router.get('/presence', controllers.getPresence);

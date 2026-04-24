@@ -1,15 +1,15 @@
-/* ANTIGRAVITY V2 — PREMIUM CENTERED GRID */
+/* Connectify Premium Centered Layout */
 
 .home-wrapper {
     min-height: 100vh;
-    background: linear-gradient(180deg, #0b1220 0%, #0e1628 100%);
+    /* Uses global radial gradient from body instead of hardcoded background here */
     display: flex;
     justify-content: center;
 }
 
 .home-container {
     padding: 24px;
-    max-width: 1400px;
+    max-width: 800px; /* Reduced max-width for more app-like feel on desktop */
     margin: 0 auto;
     width: 100%;
 }
@@ -17,7 +17,16 @@
 /* GRID */
 
 .discover-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Tablet/Desktop expansion for cards if needed */
+@media (min-width: 768px) {
+    .discover-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
 }

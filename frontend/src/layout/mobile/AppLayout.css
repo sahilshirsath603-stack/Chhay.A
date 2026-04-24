@@ -1,4 +1,4 @@
-/* AppLayout.css - Premium Mobile View */
+/* Mobile AppLayout — bottom nav layout (same as original) */
 .app-layout {
     display: flex;
     flex-direction: column;
@@ -45,7 +45,6 @@
 }
 
 .logo-icon {
-    /* Lucide icons set text color via stroke */
     color: var(--accent-1);
 }
 

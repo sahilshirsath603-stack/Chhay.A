@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Icon from '../components/ui/Icon';
-import { APP_ICONS } from '../constants/icons';
+import Icon from '../../components/ui/Icon';
+import { APP_ICONS } from '../../constants/icons';
 import './Register.css';
 
 const DEFAULT_MOODS = ['Happy', 'Chill', 'Focused', 'Energetic', 'Night Owl'];

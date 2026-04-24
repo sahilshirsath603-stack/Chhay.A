@@ -23,7 +23,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:web": "set REACT_APP_PLATFORM=web && react-scripts start",
+    "start:mobile": "set REACT_APP_PLATFORM=mobile && react-scripts start",
     "build": "react-scripts build",
+    "build:web": "set REACT_APP_PLATFORM=web && react-scripts build",
+    "build:android": "set REACT_APP_PLATFORM=mobile && react-scripts build && npx cap sync android",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

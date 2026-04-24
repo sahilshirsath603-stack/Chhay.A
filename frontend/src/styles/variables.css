@@ -1,58 +1,48 @@
 :root {
   /* ========================================= */
-  /*  Start of "Light and Shadow" Design System */
+  /*  Connectify Premium Dark Design System */
   /* ========================================= */
 
-  /* 
-     THEME: CHHAYA (Shadow) - DEFAULT
-     Concept: Deep, atmospheric, professional.
-  */
+  /* Connectify Gradients and Accents */
+  --bg-primary: #0B0F1A;
+  --bg-secondary: #121C2E;
+  --accent-1: #FF7A18;
+  --accent-2: #FF3D81;
+  --accent-3: #7B61FF;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(16px);
+  --transition: 300ms ease-in-out;
 
-  /* Brand Core */
-  --color-brand-primary: #6366f1;
-  /* Indigo 500 */
-  --color-brand-secondary: #8b5cf6;
-  /* Violet 500 */
-  --color-brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  /* Legacy Brand Core Mappings for Chat/Components */
+  --color-brand-primary: var(--accent-1);
+  --color-brand-secondary: var(--accent-2);
+  --color-brand-gradient: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
 
-  /* Backgrounds (Dark Default) */
-  --color-bg-app: #0f172a;
-  /* Slate 900 */
-  --color-bg-surface: #1e293b;
-  /* Slate 800 */
-  --color-bg-hover: #334155;
-  /* Slate 700 */
-  --color-bg-active: #475569;
-  /* Slate 600 */
+  /* Backgrounds */
+  --color-bg-app: #05070B; /* Deepest dark */
+  --color-bg-surface: var(--card-bg);
+  --color-bg-hover: rgba(255, 255, 255, 0.1);
+  --color-bg-active: rgba(255, 255, 255, 0.15);
 
   /* Message Backgrounds */
-  --color-bg-message-in: #334155;
-  /* Slate 700 */
-  --color-bg-message-out: #4f46e5;
-  /* Indigo 600 (Darker for better contrast on dark) */
+  --color-bg-message-in: rgba(255, 255, 255, 0.08);
+  --color-bg-message-out: linear-gradient(135deg, var(--accent-1), var(--accent-2));
 
-  /* Typography (Light text on Dark) */
-  --color-text-primary: #f8fafc;
-  /* Slate 50 */
-  --color-text-secondary: #cbd5e1;
-  /* Slate 300 */
-  --color-text-tertiary: #94a3b8;
-  /* Slate 400 */
-  --color-text-inverse: #0f172a;
-  /* Dark text for light elements */
+  /* Typography */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-tertiary: rgba(255, 255, 255, 0.5);
+  --color-text-inverse: #05070B;
 
   /* Borders & Dividers */
   --border-width: 1px;
-  --border-color: #334155;
-  /* Slate 700 */
+  --border-color: var(--card-border);
 
   /* Status Colors */
-  --color-status-online: #10b981;
-  /* Emerald 500 */
-  --color-status-danger: #ef4444;
-  /* Red 500 */
-  --color-status-warning: #f59e0b;
-  /* Amber 500 */
+  --color-status-online: #00E676;
+  --color-status-danger: #FF3D81;
+  --color-status-warning: #FFB000;
 
   /* Spacing System (8px grid base) */
   --spacing-xs: 4px;
@@ -69,81 +59,29 @@
   --radius-xl: 28px;
   --radius-full: 9999px;
 
-  /* Shadows (Adapted for Dark Mode - subtle glow/depth) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  /* Shadows */
+  --shadow-sm: 0 4px 10px rgba(0,0,0,0.1);
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.2);
+  --shadow-lg: 0 15px 40px rgba(0,0,0,0.3);
+  --shadow-float: 0 20px 50px rgba(0,0,0,0.4);
 
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
 
   /* Overlays */
-  --color-overlay-modal: rgba(0, 0, 0, 0.6);
-  --color-overlay-media: rgba(0, 0, 0, 0.3);
-  --color-overlay-strong: rgba(0, 0, 0, 0.7);
-  --color-attachment-bg: rgba(255, 255, 255, 0.1);
-  --color-attachment-bg-sent: rgba(255, 255, 255, 0.25);
+  --color-overlay-modal: rgba(11, 15, 26, 0.85);
+  --color-overlay-media: rgba(11, 15, 26, 0.6);
+  --color-overlay-strong: rgba(11, 15, 26, 0.9);
+  --color-attachment-bg: rgba(255, 255, 255, 0.05);
+  --color-attachment-bg-sent: rgba(255, 255, 255, 0.15);
   --color-scroll-track: transparent;
-  --color-scroll-thumb: var(--color-bg-active);
+  --color-scroll-thumb: rgba(255,255,255,0.2);
 
-  /* Bottom Dock - Chhaya (Dark) */
-  --dock-bg: rgba(30, 41, 59, 0.8);
-  --dock-border: rgba(255, 255, 255, 0.1);
-  --dock-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-  --dock-active: #6366f1;
-  --dock-muted: #94a3b8;
-}
-
-/* 
-   THEME: PRAKASH (Light)
-   Concept: Clarity, brightness, energy.
-*/
-[data-theme='prakash'] {
-  /* Backgrounds */
-  --color-bg-app: #f1f5f9;
-  /* Slate 100 */
-  --color-bg-surface: #ffffff;
-  /* White */
-  --color-bg-hover: #f8fafc;
-  /* Slate 50 */
-  --color-bg-active: #e2e8f0;
-  /* Slate 200 */
-
-  /* Message Backgrounds */
-  --color-bg-message-in: #ffffff;
-  --color-bg-message-out: #6366f1;
-  /* Indigo 500 */
-
-  /* Typography (Dark text on Light) */
-  --color-text-primary: #0f172a;
-  /* Slate 900 */
-  --color-text-secondary: #475569;
-  /* Slate 600 */
-  --color-text-tertiary: #94a3b8;
-  /* Slate 400 */
-  --color-text-inverse: #ffffff;
-
-  /* Borders */
-  --border-color: #e2e8f0;
-  /* Slate 200 */
-
-  /* Overlays */
-  --color-overlay-modal: rgba(0, 0, 0, 0.5);
-  --color-attachment-bg: rgba(0, 0, 0, 0.05);
-  --color-attachment-bg-sent: rgba(255, 255, 255, 0.3);
-
-  /* Shadows (Softer for Light Mode) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
-  /* Bottom Dock - Prakash (Light) */
-  --dock-bg: rgba(255, 255, 255, 0.9);
-  --dock-border: rgba(0, 0, 0, 0.05);
-  --dock-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --dock-active: #6366f1;
-  --dock-muted: #64748b;
+  /* Bottom Dock - Connectify */
+  --dock-bg: rgba(11, 15, 26, 0.85);
+  --dock-border: var(--card-border);
+  --dock-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+  --dock-active: #FFFFFF;
+  --dock-muted: rgba(255, 255, 255, 0.5);
 }

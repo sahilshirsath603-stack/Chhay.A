@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 
 const connectDB = require('./config/db');
+const { createRedisClient } = require('./config/redis');
 const authRoutes = require('./routes/authRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const messageRoutes = require('./routes/messageRoutes');
@@ -31,6 +32,10 @@ app.use('/uploads', express.static('uploads'));
 
 // TEMPORARILY comment DB to confirm server works
 connectDB();
+
+// Initialize Redis (non-blocking — app works without it)
+createRedisClient();
+
 app.use('/api/groups', groupRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);

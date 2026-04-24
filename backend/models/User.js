@@ -6,6 +6,14 @@ const userSchema = new mongoose.Schema(
     username: { type: String, unique: true, sparse: true, trim: true },
     email: { type: String, unique: true },
     passwordHash: String,
+    // Email verification (OTP now stored in Redis via otpService)
+    isVerified: { type: Boolean, default: true },  // true keeps existing users active
+    // @deprecated - kept as Redis fallback only; otpService is the source of truth
+    emailVerifyOTP: { type: String, default: null },
+    emailVerifyOTPExpiry: { type: Date, default: null },
+    // Password reset (still stored in Mongo for link-based reset)
+    passwordResetToken: { type: String, default: null },
+    passwordResetExpiry: { type: Date, default: null },
     about: { type: String, default: '', maxlength: 120 },
     avatar: { type: String, default: null },
     lastSeen: { type: Date, default: null },
