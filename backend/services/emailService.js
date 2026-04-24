@@ -18,7 +18,7 @@ const emailWrapper = (content) => `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chaaya</title>
+  <title>Connectify</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,14 +40,14 @@ const emailWrapper = (content) => `
 <body>
   <div class="container">
     <div class="header">
-      <h1>✦ Chaaya</h1>
+      <h1>✦ Connectify</h1>
       <p>Connect with people who match your vibe</p>
     </div>
     <div class="body">
       ${content}
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} Chaaya. This email was sent to you because you have an account with us.<br/>
+      &copy; ${new Date().getFullYear()} Connectify. This email was sent to you because you have an account with us.<br/>
       If you didn't request this, please ignore this email.
     </div>
   </div>
@@ -64,7 +64,7 @@ const sendVerificationOTP = async (email, name, otp) => {
 
   const html = emailWrapper(`
     <h2>👋 Welcome, ${name}!</h2>
-    <p>You're almost there. Use the OTP below to verify your email address and activate your Chaaya account.</p>
+    <p>You're almost there. Use the OTP below to verify your email address and activate your Connectify account.</p>
     <div class="otp-box">${digitBoxes}</div>
     <div class="note">
       ⏰ This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.
@@ -72,11 +72,11 @@ const sendVerificationOTP = async (email, name, otp) => {
   `);
 
   await transporter.sendMail({
-    from: `"Chaaya" <${process.env.GMAIL_USER}>`,
+    from: `"Connectify" <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: `${otp} is your Chaaya verification code`,
+    subject: `${otp} is your Connectify verification code`,
     html,
-    text: `Your Chaaya verification OTP is: ${otp}. It expires in 10 minutes.`,
+    text: `Your Connectify verification OTP is: ${otp}. It expires in 10 minutes.`,
   });
 
   console.log(`✅ Verification OTP sent to ${email}`);
@@ -88,7 +88,7 @@ const sendPasswordResetEmail = async (email, name, resetLink) => {
 
   const html = emailWrapper(`
     <h2>🔐 Reset your password</h2>
-    <p>Hi <strong>${name}</strong>, we received a request to reset your Chaaya password.</p>
+    <p>Hi <strong>${name}</strong>, we received a request to reset your Connectify password.</p>
     <p style="margin-top: 16px;">Click the button below to choose a new password:</p>
     <a href="${resetLink}" class="btn">Reset My Password</a>
     <p style="font-size: 13px; color: #888;">Or paste this link in your browser:</p>
@@ -99,11 +99,11 @@ const sendPasswordResetEmail = async (email, name, resetLink) => {
   `);
 
   await transporter.sendMail({
-    from: `"Chaaya" <${process.env.GMAIL_USER}>`,
+    from: `"Connectify" <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: 'Reset your Chaaya password',
+    subject: 'Reset your Connectify password',
     html,
-    text: `Reset your Chaaya password using this link: ${resetLink}. It expires in 30 minutes.`,
+    text: `Reset your Connectify password using this link: ${resetLink}. It expires in 30 minutes.`,
   });
 
   console.log(`✅ Password reset email sent to ${email}`);
@@ -115,7 +115,7 @@ const sendWelcomeEmail = async (email, name) => {
 
   const html = emailWrapper(`
     <h2>🎉 You're in, ${name}!</h2>
-    <p>Your Chaaya account is now verified and ready to use. Start connecting with people who match your vibe.</p>
+    <p>Your Connectify account is now verified and ready to use. Start connecting with people who match your vibe.</p>
     <p style="margin-top: 20px; color: #aaa;">Here's what you can do:</p>
     <ul style="margin-top: 12px; padding-left: 20px; color: #bbb; line-height: 2;">
       <li>Find and connect with new people</li>
@@ -125,11 +125,11 @@ const sendWelcomeEmail = async (email, name) => {
   `);
 
   await transporter.sendMail({
-    from: `"Chaaya" <${process.env.GMAIL_USER}>`,
+    from: `"Connectify" <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: '✦ Welcome to Chaaya!',
+    subject: '✦ Welcome to Connectify!',
     html,
-    text: `Welcome to Chaaya, ${name}! Your account is now verified.`,
+    text: `Welcome to Connectify, ${name}! Your account is now verified.`,
   });
 };
 

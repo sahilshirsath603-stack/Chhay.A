@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.antigravity.chaaya',
-  appName: 'Chaaya',
+  appId: 'com.antigravity.connectify',
+  appName: 'Connectify',
   webDir: 'build'
 };
 

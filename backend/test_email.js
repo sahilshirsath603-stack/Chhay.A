@@ -48,15 +48,15 @@ async function testEmail() {
   console.log('\n⏳ Sending test email to', process.env.GMAIL_USER, '...');
   try {
     const info = await transporter.sendMail({
-      from: `"Chaaya Test" <${process.env.GMAIL_USER}>`,
+      from: `"Connectify Test" <${process.env.GMAIL_USER}>`,
       to: process.env.GMAIL_USER,
-      subject: '✅ Chaaya Email Test — OTP System Working!',
+      subject: '✅ Connectify Email Test — OTP System Working!',
       html: `<div style="font-family:Arial;padding:20px;background:#1a1a2e;color:#fff;border-radius:10px;">
-        <h2 style="color:#a78bfa;">✦ Chaaya Email Test</h2>
+        <h2 style="color:#a78bfa;">✦ Connectify Email Test</h2>
         <p>If you see this — your email system is working correctly! 🎉</p>
         <p style="color:#888;font-size:12px;">Sent at: ${new Date().toISOString()}</p>
       </div>`,
-      text: 'Chaaya email test successful!',
+      text: 'Connectify email test successful!',
     });
     console.log('\n✅ Email sent successfully!');
     console.log('Message ID:', info.messageId);
