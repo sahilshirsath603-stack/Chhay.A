@@ -1,6 +1,12 @@
 require('dotenv').config({ path: '.env.local' });
 require('dotenv').config();
 
+const dns = require('dns');
+// Force IPv4 for DNS resolution to fix ENETUNREACH on Render for Gmail SMTP (IPv6 issues)
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
