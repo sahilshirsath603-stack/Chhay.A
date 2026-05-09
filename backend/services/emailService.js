@@ -1,21 +1,4 @@
-const nodemailer = require('nodemailer');
-
-// ─── Transporter ────────────────────────────────────────────────────────────
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    family: 4, // force IPv4
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    connectionTimeout: 10000,  // 10s to establish TCP connection
-    socketTimeout: 20000,      // 20s for each socket operation
-    greetingTimeout: 10000,    // 10s for server greeting
-  });
-};
+const axios = require('axios');
 
 // ─── Shared Email Styles ─────────────────────────────────────────────────────
 const emailWrapper = (content) => `
@@ -61,10 +44,45 @@ const emailWrapper = (content) => `
 </html>
 `;
 
+// ─── Resend HTTP API Sender ──────────────────────────────────────────────────
+const sendEmailHTTP = async ({ to, subject, html, text }) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not set');
+  }
+
+  // Note: if you don't have a custom domain on Resend, you MUST use onboarding@resend.dev
+  // and you can ONLY send emails to the email address you registered with Resend.
+  const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+
+  try {
+    const response = await axios.post(
+      'https://api.resend.com/emails',
+      {
+        from: \`Connectify <\${fromEmail}>\`,
+        to: [to],
+        subject: subject,
+        html: html,
+        text: text,
+      },
+      {
+        headers: {
+          'Authorization': \`Bearer \${apiKey}\`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000, // 10s timeout
+      }
+    );
+    return response.data;
+  } catch (error) {
+    const errorDetails = error.response ? error.response.data : error.message;
+    console.error('❌ Resend API Error:', errorDetails);
+    throw new Error('Failed to send email via HTTP API');
+  }
+};
+
 // ─── Send Verification OTP ───────────────────────────────────────────────────
 const sendVerificationOTP = async (email, name, otp) => {
-  const transporter = createTransporter();
-
   const digits = otp.toString().split('');
   const digitBoxes = digits.map(d => `<div class="otp-digit">${d}</div>`).join('');
 
@@ -77,21 +95,18 @@ const sendVerificationOTP = async (email, name, otp) => {
     </div>
   `);
 
-  await transporter.sendMail({
-    from: `"Connectify" <${process.env.GMAIL_USER}>`,
+  await sendEmailHTTP({
     to: email,
     subject: `${otp} is your Connectify verification code`,
     html,
     text: `Your Connectify verification OTP is: ${otp}. It expires in 10 minutes.`,
   });
 
-  console.log(`✅ Verification OTP sent to ${email}`);
+  console.log(`✅ Verification OTP sent to ${email} via Resend`);
 };
 
 // ─── Send Password Reset Email ───────────────────────────────────────────────
 const sendPasswordResetEmail = async (email, name, resetLink) => {
-  const transporter = createTransporter();
-
   const html = emailWrapper(`
     <h2>🔐 Reset your password</h2>
     <p>Hi <strong>${name}</strong>, we received a request to reset your Connectify password.</p>
@@ -104,21 +119,18 @@ const sendPasswordResetEmail = async (email, name, resetLink) => {
     </div>
   `);
 
-  await transporter.sendMail({
-    from: `"Connectify" <${process.env.GMAIL_USER}>`,
+  await sendEmailHTTP({
     to: email,
     subject: 'Reset your Connectify password',
     html,
     text: `Reset your Connectify password using this link: ${resetLink}. It expires in 30 minutes.`,
   });
 
-  console.log(`✅ Password reset email sent to ${email}`);
+  console.log(`✅ Password reset email sent to ${email} via Resend`);
 };
 
 // ─── Send Welcome Email ──────────────────────────────────────────────────────
 const sendWelcomeEmail = async (email, name) => {
-  const transporter = createTransporter();
-
   const html = emailWrapper(`
     <h2>🎉 You're in, ${name}!</h2>
     <p>Your Connectify account is now verified and ready to use. Start connecting with people who match your vibe.</p>
@@ -130,8 +142,7 @@ const sendWelcomeEmail = async (email, name) => {
     </ul>
   `);
 
-  await transporter.sendMail({
-    from: `"Connectify" <${process.env.GMAIL_USER}>`,
+  await sendEmailHTTP({
     to: email,
     subject: '✦ Welcome to Connectify!',
     html,
@@ -140,3 +151,4 @@ const sendWelcomeEmail = async (email, name) => {
 };
 
 module.exports = { sendVerificationOTP, sendPasswordResetEmail, sendWelcomeEmail };
+

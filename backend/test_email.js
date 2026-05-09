@@ -1,72 +1,65 @@
 // Quick email test script — run with: node test_email.js
 require('dotenv').config({ path: '.env.local' });
-
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 async function testEmail() {
-  console.log('\n📧 Testing Gmail SMTP...');
-  console.log('GMAIL_USER:', process.env.GMAIL_USER);
-  console.log('GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? `"${process.env.GMAIL_APP_PASSWORD}" (length: ${process.env.GMAIL_APP_PASSWORD.length})` : '❌ NOT SET');
+  console.log('\n📧 Testing Resend HTTP API...');
+  
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  
+  console.log('RESEND_API_KEY:', apiKey ? `SET (length: ${apiKey.length})` : '❌ NOT SET');
+  console.log('EMAIL_FROM:', fromEmail);
 
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-    console.error('\n❌ Missing GMAIL_USER or GMAIL_APP_PASSWORD in .env.local');
+  if (!apiKey) {
+    console.error('\n❌ Missing RESEND_API_KEY in .env.local');
     process.exit(1);
   }
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    family: 4,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-
-  // Step 1: Verify connection
-  console.log('\n⏳ Verifying SMTP connection...');
-  try {
-    await transporter.verify();
-    console.log('✅ SMTP connection OK!');
-  } catch (err) {
-    console.error('\n❌ SMTP connection FAILED!');
-    console.error('Error code:', err.code);
-    console.error('Error message:', err.message);
-
-    if (err.code === 'EAUTH') {
-      console.error('\n🔑 FIX: Your App Password is wrong or 2FA is not enabled.');
-      console.error('   1. Go to: myaccount.google.com/security');
-      console.error('   2. Enable 2-Step Verification (if not already)');
-      console.error('   3. Go to: myaccount.google.com/apppasswords');
-      console.error('   4. Create a new App Password for "Mail"');
-      console.error('   5. Paste the 16-char password (with spaces) into GMAIL_APP_PASSWORD');
-    } else if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
-      console.error('\n🌐 FIX: Network issue. Check your internet connection.');
-    }
+  // To send to yourself, we need to know your email address. 
+  // If you are using onboarding@resend.dev, it MUST match your registered Resend email.
+  const toEmail = process.argv[2];
+  if (!toEmail) {
+    console.error('\n⚠️ Please provide your email address as an argument:');
+    console.error('   node test_email.js you@example.com\n');
+    console.error('Note: If using onboarding@resend.dev, this must be the email you used to sign up for Resend.');
     process.exit(1);
   }
 
-  // Step 2: Send test email
-  console.log('\n⏳ Sending test email to', process.env.GMAIL_USER, '...');
+  console.log(`\n⏳ Sending test email to ${toEmail} ...`);
   try {
-    const info = await transporter.sendMail({
-      from: `"Connectify Test" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
-      subject: '✅ Connectify Email Test — OTP System Working!',
-      html: `<div style="font-family:Arial;padding:20px;background:#1a1a2e;color:#fff;border-radius:10px;">
-        <h2 style="color:#a78bfa;">✦ Connectify Email Test</h2>
-        <p>If you see this — your email system is working correctly! 🎉</p>
-        <p style="color:#888;font-size:12px;">Sent at: ${new Date().toISOString()}</p>
-      </div>`,
-      text: 'Connectify email test successful!',
-    });
-    console.log('\n✅ Email sent successfully!');
-    console.log('Message ID:', info.messageId);
+    const response = await axios.post(
+      'https://api.resend.com/emails',
+      {
+        from: `Connectify Test <${fromEmail}>`,
+        to: [toEmail],
+        subject: '✅ Connectify Email Test — HTTP API Working!',
+        html: `<div style="font-family:Arial;padding:20px;background:#1a1a2e;color:#fff;border-radius:10px;">
+          <h2 style="color:#a78bfa;">✦ Connectify Email Test</h2>
+          <p>If you see this — your new Resend HTTP API is working correctly! 🎉</p>
+          <p style="color:#888;font-size:12px;">Sent at: ${new Date().toISOString()}</p>
+        </div>`,
+        text: 'Connectify email test successful via Resend API!',
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    console.log('\n✅ Email sent successfully via Resend API!');
+    console.log('Response ID:', response.data.id);
     console.log('\n👉 Check your inbox (and Spam folder) for the test email.');
   } catch (err) {
     console.error('\n❌ Failed to send email!');
-    console.error('Error:', err.message);
+    if (err.response) {
+      console.error('Status:', err.response.status);
+      console.error('Error Details:', err.response.data);
+    } else {
+      console.error('Error:', err.message);
+    }
     process.exit(1);
   }
 }

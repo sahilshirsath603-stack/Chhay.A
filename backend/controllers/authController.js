@@ -93,9 +93,9 @@ const signup = async (req, res) => {
       await newUser.save();
     }
 
-    // Pre-check SMTP credentials before sending
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-      console.error('❌ SMTP credentials missing: GMAIL_USER or GMAIL_APP_PASSWORD not set in environment.');
+    // Pre-check HTTP email API credentials before sending
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ Email API credentials missing: RESEND_API_KEY not set in environment.');
       // Don't delete user — keep them unverified so they can resend later
       return res.status(201).json({
         message: 'Account created but email delivery is not configured. Please contact support.',

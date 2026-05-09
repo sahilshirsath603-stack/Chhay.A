@@ -19,41 +19,14 @@ router.get('/check-username', controllers.checkUsername);
 // Diagnostic: check which env vars are set (no values exposed)
 router.get('/env-check', (req, res) => {
   res.json({
-    GMAIL_USER: process.env.GMAIL_USER ? `✅ SET (${process.env.GMAIL_USER})` : '❌ NOT SET',
-    GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD ? `✅ SET (length: ${process.env.GMAIL_APP_PASSWORD.length})` : '❌ NOT SET',
+    RESEND_API_KEY: process.env.RESEND_API_KEY ? `✅ SET (length: ${process.env.RESEND_API_KEY.length})` : '❌ NOT SET',
+    EMAIL_FROM: process.env.EMAIL_FROM || '❌ NOT SET (using default onboarding@resend.dev)',
     REDIS_URL: process.env.REDIS_URL ? '✅ SET' : '❌ NOT SET',
     MONGO_URI: process.env.MONGO_URI ? '✅ SET' : '❌ NOT SET',
     JWT_SECRET: process.env.JWT_SECRET ? '✅ SET' : '❌ NOT SET',
     FRONTEND_URL: process.env.FRONTEND_URL || '❌ NOT SET',
     NODE_ENV: process.env.NODE_ENV || 'not set',
   });
-});
-
-// Diagnostic: live SMTP send test (call this on Render to confirm email works)
-router.get('/test-email', async (req, res) => {
-  const nodemailer = require('nodemailer');
-  try {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      family: 4,
-      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
-      connectionTimeout: 10000,
-      socketTimeout: 20000,
-      greetingTimeout: 10000,
-    });
-    await transporter.verify();
-    await transporter.sendMail({
-      from: `"Connectify Test" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
-      subject: '✅ Render SMTP Test',
-      text: `SMTP working from Render at ${new Date().toISOString()}`,
-    });
-    res.json({ success: true, message: `Test email sent to ${process.env.GMAIL_USER}` });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message, code: err.code });
-  }
 });
 
 router.get('/users', authMiddleware, controllers.getUsers);
