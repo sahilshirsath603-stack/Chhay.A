@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 // ─── Shared Email Styles ─────────────────────────────────────────────────────
 const emailWrapper = (content) => `
 <!DOCTYPE html>
@@ -56,27 +54,32 @@ const sendEmailHTTP = async ({ to, subject, html, text }) => {
   const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
   try {
-    const response = await axios.post(
-      'https://api.resend.com/emails',
-      {
-        from: \`Connectify <\${fromEmail}>\`,
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: `Connectify <${fromEmail}>`,
         to: [to],
         subject: subject,
         html: html,
         text: text,
-      },
-      {
-        headers: {
-          'Authorization': \`Bearer \${apiKey}\`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 10000, // 10s timeout
-      }
-    );
-    return response.data;
+      }),
+      // Native fetch timeout (optional, though standard fetch doesn't support timeout natively like axios without AbortController.
+      // Render has its own request limits, so standard fetch is fine for this lightweight API call).
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData ? JSON.stringify(errorData) : `HTTP error! status: ${response.status}`);
+    }
+    
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
-    const errorDetails = error.response ? error.response.data : error.message;
-    console.error('❌ Resend API Error:', errorDetails);
+    console.error('❌ Resend API Error:', error.message);
     throw new Error('Failed to send email via HTTP API');
   }
 };

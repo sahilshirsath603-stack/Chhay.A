@@ -1,6 +1,5 @@
 // Quick email test script — run with: node test_email.js
 require('dotenv').config({ path: '.env.local' });
-const axios = require('axios');
 
 async function testEmail() {
   console.log('\n📧 Testing Resend HTTP API...');
@@ -28,9 +27,13 @@ async function testEmail() {
 
   console.log(`\n⏳ Sending test email to ${toEmail} ...`);
   try {
-    const response = await axios.post(
-      'https://api.resend.com/emails',
-      {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         from: `Connectify Test <${fromEmail}>`,
         to: [toEmail],
         subject: '✅ Connectify Email Test — HTTP API Working!',
@@ -40,26 +43,22 @@ async function testEmail() {
           <p style="color:#888;font-size:12px;">Sent at: ${new Date().toISOString()}</p>
         </div>`,
         text: 'Connectify email test successful via Resend API!',
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+      })
+    });
+    
+    if (!response.ok) {
+      const errData = await response.json().catch(() => null);
+      throw new Error(`Status ${response.status}: ${JSON.stringify(errData)}`);
+    }
+    
+    const responseData = await response.json();
     
     console.log('\n✅ Email sent successfully via Resend API!');
-    console.log('Response ID:', response.data.id);
+    console.log('Response ID:', responseData.id);
     console.log('\n👉 Check your inbox (and Spam folder) for the test email.');
   } catch (err) {
     console.error('\n❌ Failed to send email!');
-    if (err.response) {
-      console.error('Status:', err.response.status);
-      console.error('Error Details:', err.response.data);
-    } else {
-      console.error('Error:', err.message);
-    }
+    console.error('Error:', err.message);
     process.exit(1);
   }
 }
