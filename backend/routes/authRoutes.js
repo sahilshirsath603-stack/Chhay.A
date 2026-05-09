@@ -28,6 +28,31 @@ router.get('/env-check', (req, res) => {
     NODE_ENV: process.env.NODE_ENV || 'not set',
   });
 });
+
+// Diagnostic: live SMTP send test (call this on Render to confirm email works)
+router.get('/test-email', async (req, res) => {
+  const nodemailer = require('nodemailer');
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+      connectionTimeout: 10000,
+      socketTimeout: 20000,
+      greetingTimeout: 10000,
+    });
+    await transporter.verify();
+    await transporter.sendMail({
+      from: `"Connectify Test" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,
+      subject: '✅ Render SMTP Test',
+      text: `SMTP working from Render at ${new Date().toISOString()}`,
+    });
+    res.json({ success: true, message: `Test email sent to ${process.env.GMAIL_USER}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message, code: err.code });
+  }
+});
+
 router.get('/users', authMiddleware, controllers.getUsers);
 router.get('/presence', controllers.getPresence);
 router.get('/users/status', controllers.getUsersStatus);
